@@ -1,8 +1,15 @@
 // * Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import {
+    getAuth,
+    signInWithRedirect,
+    signInWithPopup,
+    GoogleAuthProvider,
+    createUserWithEmailAndPassword
+}
+    from 'firebase/auth';
 // * db operations
-import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore'
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
 // * https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -26,13 +33,15 @@ provider.setCustomParameters({
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup =  () => signInWithPopup(auth, provider);
-export const signInWithGoogleRedirect =  () => signInWithRedirect(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider);
 
 // * database initialization
 export const db = getFirestore();
 
 export const createUserDocumentFromAuth = async (userAuth) => {
+    if(!userAuth) return;
+
     // ! get reference to userDoc from database using userAuth
     const userDocRef = doc(db, 'users', userAuth.uid);
 
@@ -43,18 +52,24 @@ export const createUserDocumentFromAuth = async (userAuth) => {
     // ! check if the instance of snapshot exists
     console.log(userSnapShot.exists());
 
-    if(!userSnapShot.exists()) {
-        const {displayName, email} = userAuth;
+    if (!userSnapShot.exists()) {
+        const { displayName, email } = userAuth;
         const createdAt = new Date();
 
-        try{
-            await setDoc(userDocRef, {displayName, email, createdAt});
+        try {
+            await setDoc(userDocRef, { displayName, email, createdAt });
         }
-        catch(error){
+        catch (error) {
             console.log(error.message);
         }
     }
 
     // * if the userSnapShot exists then return Doc Reference 
     return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+    if(!email || !password) { return; }
+
+    return await createAuthUserWithEmailAndPassword(auth, email, password);
 }
