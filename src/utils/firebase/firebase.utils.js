@@ -39,7 +39,9 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider)
 // * database initialization
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (userAuth, 
+    additionalInformation = {}
+    ) => {
     if(!userAuth) return;
 
     // ! get reference to userDoc from database using userAuth
@@ -57,7 +59,7 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         const createdAt = new Date();
 
         try {
-            await setDoc(userDocRef, { displayName, email, createdAt });
+            await setDoc(userDocRef, { displayName, email, createdAt, ...additionalInformation });
         }
         catch (error) {
             console.log(error.message);
